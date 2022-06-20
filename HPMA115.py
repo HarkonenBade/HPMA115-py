@@ -1,7 +1,7 @@
 import struct
 import time
 from enum import Enum
-from typing import Optional
+from typing import Callable, Optional
 
 import serial
 
@@ -75,6 +75,11 @@ def _checksum(packet: bytes):
 
 
 class HPMA115(object):
+    """
+    Base HPMA115 implementation.
+
+    Do not instantiate directly, use either HPMA115C0 for the compact model or HPMA115S0 for the original model.
+    """
     SampleCls = None
 
     def __init__(self, port: str):
@@ -148,7 +153,7 @@ class HPMA115(object):
         if self._recv().state == PacketState.NEGACK:
             raise CommandFailure()
 
-    def sample(self):
+    def sample(self) -> "Self.SampleCls":
         """
         Retrieves a single sample from the device as long as measurement is currently active.
 
@@ -186,7 +191,7 @@ class HPMA115(object):
         else:
             return int.from_bytes(rsp.data, "big")
 
-    def autosample(self, callback):
+    def autosample(self, callback: Callable[["Self.SampleCls"], bool]):
         """
         Enables autosampling mode, passing each received sample to the provided callback. If the callback returns false the sampling is disabled, otherwise the sampling continues.
 
