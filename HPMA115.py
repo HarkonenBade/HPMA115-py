@@ -218,31 +218,3 @@ class HPMA115C0(HPMA115):
 class HPMA115S0(HPMA115):
     SampleCls = SampleS0
 
-
-def test():
-    sens = HPMA115C0("/dev/ttyACM0")
-
-    _coeff = sens.read_cust_adj_coeff()
-    print(_coeff)
-    sens.set_cust_adj_coeff(195)
-    print(sens.read_cust_adj_coeff())
-    sens.set_cust_adj_coeff(_coeff)
-
-    sens.start_measurement()
-    for i in range(5):
-        print(sens.sample())
-        time.sleep(1)
-
-    x = 0
-
-    def repl(sample):
-        global x
-        print(sample)
-        x += 1
-        return x < 5
-
-    sens.autosample(repl)
-
-
-if __name__ == "__main__":
-    test()
